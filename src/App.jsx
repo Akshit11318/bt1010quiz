@@ -87,16 +87,28 @@ export default function App() {
 
         // Cleanup LaTeX noise for clean display
         const cleanLatex = (str) => {
-          return str
+          const escaped = str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+          return escaped
             .replace(/\\textbf\{(.*?)\}/g, '$1')
             .replace(/\\textit\{(.*?)\}/g, '$1')
             .replace(/\\\\\s*/g, ' ')
             .replace(/\\end\{enumerate\}.*/s, '')
             .replace(/\$([^$]+)\$/g, '$1')
+            .replace(/\\underline\{\\hspace\{[^}]+\}\}/g, '_____')
+            .replace(/(?:\\_){2,}/g, '_____')
             .replace(/\\rightarrow/g, '→')
             .replace(/\\rightleftharpoons/g, '⇌')
             .replace(/\\circ\\text\{C\}/g, '°C')
             .replace(/\\delta/g, 'δ')
+            .replace(/\\mu/g, 'μ')
+            .replace(/([A-Za-z0-9)\]])_\{([^}]+)\}/g, '$1<sub>$2</sub>')
+            .replace(/([A-Za-z0-9)\]])_([A-Za-z0-9+-])/g, '$1<sub>$2</sub>')
+            .replace(/([A-Za-z0-9)\]])\^\{([^}]+)\}/g, '$1<sup>$2</sup>')
+            .replace(/([A-Za-z0-9)\]])\^([A-Za-z0-9+-])/g, '$1<sup>$2</sup>')
             .trim();
         };
 
@@ -238,10 +250,10 @@ export default function App() {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : theme === 'dark'
-                    ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                ? 'bg-blue-600 text-white shadow-md'
+                : theme === 'dark'
+                  ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
             >
               {tab}
@@ -486,9 +498,10 @@ export default function App() {
 
       {/* Question Content */}
       <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth">
-        <h2 className={`text-[19px] font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-800'} leading-8 mb-4`}>
-          {q.q}
-        </h2>
+        <h2
+          className={`text-[19px] font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-800'} leading-8 mb-4`}
+          dangerouslySetInnerHTML={{ __html: q.q }}
+        />
         {!isAnswered && (
           <p className={`text-xs mb-4 font-normal ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
             Tap an option to reveal answer and explanation.
@@ -537,7 +550,10 @@ export default function App() {
                   }`}>
                   {String.fromCharCode(65 + i)}
                 </div>
-                <span className="font-medium text-[16px] leading-6 flex-1 pt-1">{opt}</span>
+                <span
+                  className="font-medium text-[16px] leading-6 flex-1 pt-1"
+                  dangerouslySetInnerHTML={{ __html: opt }}
+                />
                 {icon}
               </button>
             );
@@ -548,9 +564,10 @@ export default function App() {
         {isAnswered && (
           <div className={`mt-6 ${theme === 'dark' ? 'bg-blue-900/30 border-blue-700' : 'bg-blue-50/80 border-blue-100'} border rounded-2xl p-5 animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-sm`}>
             <h4 className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-blue-300' : 'text-blue-800'} mb-3`}>Explanation</h4>
-            <p className={`text-[15px] font-serif ${theme === 'dark' ? 'text-blue-200' : 'text-blue-900/80'} leading-7`}>
-              {q.exp}
-            </p>
+            <p
+              className={`text-[15px] font-serif ${theme === 'dark' ? 'text-blue-200' : 'text-blue-900/80'} leading-7`}
+              dangerouslySetInnerHTML={{ __html: q.exp }}
+            />
           </div>
         )}
 

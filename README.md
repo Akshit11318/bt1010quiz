@@ -46,3 +46,13 @@ Then restart tunnel:
 ```bash
 cloudflared tunnel run
 ```
+
+## Reapply updates after `git pull` (Docker)
+
+```bash
+cd bt1010quiz
+git pull
+docker rm -f bt1010quiz 2>/dev/null || true
+docker build -t bt1010quiz:latest .
+docker run -d --name bt1010quiz -p 127.0.0.1:8090:80 --restart unless-stopped bt1010quiz:latest
+```
