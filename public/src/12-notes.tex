@@ -1,0 +1,107 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[english, bidi=basic, provide=*]{babel}
+\babelprovide[import, onchar=ids fonts]{english}
+\babelfont{rm}{TeX Gyre Termes}
+\babelfont{sf}{TeX Gyre Heros}
+\babelfont{tt}{TeX Gyre Cursor}
+\usepackage{enumitem}
+\usepackage{amsmath}
+
+\title{Study Notes: The Cell Cycle (Chapter 12)}
+\author{Subject: Biology}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Core Concepts}
+\begin{itemize}
+    \item \textbf{Purpose of Cell Division:} Reproduction (unicellular), growth, and repair (multicellular).
+    \item \textbf{The Goal:} Distribution of identical genetic material (DNA) to two daughter cells.
+    \item \textbf{Genome:} A cell's total DNA. Prokaryotes usually have one circular molecule; Eukaryotes have multiple linear molecules.
+    \item \textbf{Chromosomes:} Packaged DNA. Somatic cells are diploid ($2n = 46$ in humans); Gametes are haploid ($n = 23$ in humans).
+    \item \textbf{Sister Chromatids:} Joined copies of the original chromosome.
+\end{itemize}
+
+\section*{Key Definitions}
+\begin{itemize}
+    \item \textbf{Chromatin:} The complex of DNA and protein that makes up eukaryotic chromosomes.
+    \item \textbf{Centromere:} The region where sister chromatids are most closely attached.
+    \item \textbf{Mitosis:} Nuclear division resulting in genetically identical nuclei.
+    \item \textbf{Cytokinesis:} Division of the cytoplasm.
+    \item \textbf{Interphase:} 90\% of the cell cycle; includes G1, S, and G2 phases.
+    \item \textbf{Kinetochore:} Protein structure at the centromere for spindle attachment.
+\end{itemize}
+
+\section*{Important Formulas / Relations}
+\begin{itemize}
+    \item \textbf{DNA Length vs. Cell Size:} 2 m of DNA vs. micrometer-scale cell diameter ($\approx 250,000\times$ length).
+    \item \textbf{Chromosome Count:} 
+    \begin{itemize}
+        \item After S phase: Chromosome count remains same, but DNA mass doubles.
+        \item After Anaphase start: Chromosome count doubles temporarily as sister chromatids become individual chromosomes.
+    \end{itemize}
+    \item \textbf{Somatic vs. Gamete:} Somatic = $2n$, Gamete = $n$.
+\end{itemize}
+
+\section*{Processes / Workflows}
+
+\subsection*{The Eukaryotic Cell Cycle}
+\begin{enumerate}
+    \item \textbf{Interphase:}
+    \begin{itemize}
+        \item \textbf{G1 (First Gap):} Metabolic activity and growth.
+        \item \textbf{S (Synthesis):} Metabolic activity, growth, and \textbf{DNA replication}.
+        \item \textbf{G2 (Second Gap):} Metabolic activity, growth, and preparation for division.
+    \end{itemize}
+    \item \textbf{Mitotic (M) Phase:}
+    \begin{itemize}
+        \item \textbf{Prophase:} Chromosomes condense; spindle starts forming; nucleoli disappear.
+        \item \textbf{Prometaphase:} Envelope fragments; spindle attaches to kinetochores.
+        \item \textbf{Metaphase:} Chromosomes align at the metaphase plate (center).
+        \item \textbf{Anaphase:} \textbf{Separase} cleaves cohesins; chromatids part suddenly; cell elongates.
+        \item \textbf{Telophase:} Two daughter nuclei form; nucleoli reappear; chromosomes de-condense.
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Cytokinesis: Animal vs. Plant}
+\begin{itemize}
+    \item \textbf{Animals:} \textbf{Cleavage furrow} forms. A contractile ring of \textbf{actin} and \textbf{myosin} pinches the cell.
+    \item \textbf{Plants:} \textbf{Cell plate} forms. Golgi-derived vesicles carry wall materials to the cell center to build a new wall.
+\end{itemize}
+
+\subsection*{Prokaryotic Binary Fission}
+\begin{itemize}
+    \item Chromosome replication starts at the \textbf{origin of replication}.
+    \item One origin moves to the opposite pole (actin-like protein involvement).
+    \item Cell elongates and membrane pinches inward (tubulin-like protein involvement).
+\end{itemize}
+
+\section*{Common Mistakes and Clarifications}
+\begin{itemize}
+    \item \textbf{Sister Chromatids vs. Chromosomes:} Two sister chromatids make up ONE duplicated chromosome. Once they separate in anaphase, they are called individual chromosomes.
+    \item \textbf{Centrosome vs. Centriole:} Centrosome is the region; centrioles are the paired structures inside. Spindles can form without centrioles (plants).
+    \item \textbf{Gap Phases:} "Gaps" do not mean the cell is resting; it is metabolically hyperactive.
+    \item \textbf{Mitosis vs. Cytokinesis:} Mitosis is nuclear; cytokinesis is cytoplasmic.
+\end{itemize}
+
+\section*{Exam-Focused Quick Revision}
+\begin{itemize}
+    \item \textbf{Checkpoints:}
+    \begin{itemize}
+        \item \textbf{G1 Checkpoint:} Most critical. "Go-ahead" $\rightarrow$ division; No signal $\rightarrow$ \textbf{G0 phase}.
+        \item \textbf{G2 Checkpoint:} Verifies DNA replication is complete.
+        \item \textbf{M Checkpoint:} Verifies all kinetochores are attached to spindle fibers.
+    \end{itemize}
+    \item \textbf{Regulatory Molecules:}
+    \begin{itemize}
+        \item \textbf{Cyclin:} Concentration fluctuates rhythmically.
+        \item \textbf{Cdk (Cyclin-dependent Kinase):} Active only when bound to cyclin.
+        \item \textbf{MPF:} Cyclin-Cdk complex that triggers mitosis.
+    \end{itemize}
+    \item \textbf{Spindle Anatomy:} Centrosomes + Spindle Microtubules + Asters.
+\end{itemize}
+
+\end{document}

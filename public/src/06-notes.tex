@@ -1,0 +1,102 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[english, bidi=basic, provide=*]{babel}
+\babelprovide[import, onchar=ids fonts]{english}
+\babelfont{rm}{TeX Gyre Termes}
+\babelfont{sf}{TeX Gyre Heros}
+\babelfont{tt}{TeX Gyre Cursor}
+\usepackage{enumitem}
+\usepackage{amsmath}
+
+\title{Study Notes: A Tour of the Cell}
+\author{Subject: Biology}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Core Concepts}
+\begin{itemize}
+    \item \textbf{Cell Theory:} The cell is the basic structural and functional unit of life. All organisms are made of cells.
+    \item \textbf{Prokaryotic vs. Eukaryotic:}
+    \begin{itemize}
+        \item \textbf{Prokaryotes:} No nucleus (DNA in nucleoid), no membrane-bound organelles, smaller (1--5 $\mu$m).
+        \item \textbf{Eukaryotes:} True nucleus, complex organelles, larger (10--100 $\mu$m).
+    \end{itemize}
+    \item \textbf{Surface Area to Volume Ratio ($SA:V$):} Critical for cell efficiency. As cells grow, volume ($r^3$) increases faster than surface area ($r^2$), making it harder to exchange materials. Small cells or cells with projections (microvilli) have higher $SA:V$.
+\end{itemize}
+
+\section*{Key Definitions}
+\begin{itemize}
+    \item \textbf{Magnification:} Ratio of image size to real size.
+    \item \textbf{Resolution:} Measure of image clarity (minimum distance to distinguish two points).
+    \item \textbf{Contrast:} Difference in brightness between light and dark areas.
+    \item \textbf{Cytology:} The study of cell structure.
+    \item \textbf{Biochemistry:} The study of chemical processes (metabolism) in cells.
+    \item \textbf{Cell Fractionation:} Technique using a centrifuge to separate cell components by size and density.
+\end{itemize}
+
+\section*{Important Structures \& Organelles}
+
+\subsection*{The Genetic Controllers}
+\begin{itemize}
+    \item \textbf{Nucleus:} Houses DNA. Enclosed by \textbf{nuclear envelope} (double membrane). Contains \textbf{nucleolus} (rRNA synthesis/ribosome assembly).
+    \item \textbf{Ribosomes:} Complexes of rRNA and protein. Site of \textbf{protein synthesis}.
+    \begin{itemize}
+        \item \textit{Free ribosomes:} In cytosol; make proteins used in cytosol.
+        \item \textit{Bound ribosomes:} On ER; make proteins for membranes, secretion, or organelles.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{The Endomembrane System}
+\begin{itemize}
+    \item \textbf{Endoplasmic Reticulum (ER):}
+    \begin{itemize}
+        \item \textit{Smooth ER:} Lipid synthesis, carbohydrate metabolism, detoxification, calcium storage.
+        \item \textit{Rough ER:} Synthesis of secretory proteins (glycoproteins), membrane factory.
+    \end{itemize}
+    \item \textbf{Golgi Apparatus:} Shipping/receiving center. Modifies ER products (carbohydrates/lipids). \textit{Cis} face receives; \textit{trans} face ships.
+    \item \textbf{Lysosomes:} Sacs of hydrolytic enzymes for digestion and recycling (\textbf{autophagy}).
+    \item \textbf{Vacuoles:} Large vesicles for storage, waste disposal, and water balance (central vacuole in plants).
+\end{itemize}
+
+\subsection*{Energy Transformers}
+\begin{itemize}
+    \item \textbf{Mitochondria:} Site of \textbf{cellular respiration} (ATP production). Features: \textbf{cristae} (folds), \textbf{matrix} (inner fluid).
+    \item \textbf{Chloroplasts:} Site of \textbf{photosynthesis}. Features: \textbf{thylakoids} (stacks = grana), \textbf{stroma} (fluid).
+    \item \textbf{Endosymbiont Theory:} Mitochondria and chloroplasts were once small prokaryotes engulfed by larger cells. Evidence: double membranes, own circular DNA, own ribosomes, autonomous reproduction.
+\end{itemize}
+
+\section*{Processes / Workflows}
+\begin{itemize}
+    \item \textbf{Protein Pathway:} mRNA (Nucleus) $\rightarrow$ Ribosome (Rough ER) $\rightarrow$ Transport Vesicle $\rightarrow$ Golgi (cis $\rightarrow$ trans) $\rightarrow$ Transport Vesicle $\rightarrow$ Plasma Membrane / Secretion.
+    \item \textbf{Detoxification:} Smooth ER adds hydroxyl groups to toxins to increase solubility for excretion.
+    \item \textbf{Phagocytosis:} Cell engulfs food $\rightarrow$ food vacuole forms $\rightarrow$ fuses with lysosome $\rightarrow$ enzymes digest contents.
+\end{itemize}
+
+\section*{Common Mistakes and Clarifications}
+\begin{itemize}
+    \item \textbf{Centrioles vs. Centrosomes:} Centrosome is the region; centrioles are the structures inside. Plant cells have centrosomes but usually lack centrioles.
+    \item \textbf{Cell Wall vs. Plasma Membrane:} ALL cells have a plasma membrane; only plants, fungi, and prokaryotes have cell walls.
+    \item \textbf{Resolution Limit:} Standard LMs cannot resolve below 200 nm because of the wavelength of visible light. EMs use electron beams (shorter wavelength) to reach 2 nm or better.
+\end{itemize}
+
+\section*{Exam-Focused Quick Revision}
+\begin{itemize}
+    \item \textbf{Cytoskeleton Components:}
+    \begin{enumerate}
+        \item \textbf{Microtubules:} Tubulin; 25nm; shape, motility (cilia/flagella), chromosome movement.
+        \item \textbf{Microfilaments:} Actin; 7nm; muscle contraction, amoeboid movement, cleavage furrow.
+        \item \textbf{Intermediate Filaments:} Keratin; 8--12nm; nuclear lamina, organelle anchorage.
+    \end{enumerate}
+    \item \textbf{Cell Junctions:}
+    \begin{itemize}
+        \item \textbf{Plasmodesmata (Plants):} Cytoplasmic channels between cells.
+        \item \textbf{Gap Junctions (Animals):} Channels for ion/molecule flow.
+        \item \textbf{Tight Junctions (Animals):} Prevent fluid leakage.
+        \item \textbf{Desmosomes (Animals):} Rivets for strong sheets (anchoring).
+    \end{itemize}
+\end{itemize}
+
+\end{document}

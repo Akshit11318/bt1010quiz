@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+/* Reset some defaults for better Tailwind experience */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+/* Dark mode support */
+
+:root {
+    transition: background-color 0.3s ease;
+}
+
+.dark {
+    background-color: rgb(15 23 42);
+}
+
+body {
+    transition: background-color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.45;
+    letter-spacing: 0;
+    padding: 0.5rem;
+    background-color: rgb(248 250 252);
+}
+
+.dark body {
+    background-color: rgb(2 6 23);
+}
+
+
+/* Smooth scrolling for all scrollable elements */
+
+* {
+    scroll-behavior: smooth;
+}
