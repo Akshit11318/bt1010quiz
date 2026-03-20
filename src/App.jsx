@@ -5,6 +5,8 @@ import {
   Sun, Moon, LogOut
 } from 'lucide-react';
 
+const BUILD_ID = import.meta.env.VITE_BUILD_ID || 'local';
+
 const QUIZ_MODULES = [
   { id: '01', title: 'Chapter 1: Biology & Inquiry', file: '01-mcqs.tex', color: 'bg-emerald-500' },
   { id: '02', title: 'Chapter 2: Chemistry of Life', file: '02-mcqs.tex', color: 'bg-teal-500' },
@@ -59,13 +61,25 @@ export default function App() {
   const parseLatex = (text) => {
     const parsedQuestions = [];
     const blocks = text.split(/\\item\s+\\textbf\{/);
+    const findMatchingBrace = (input, startIndex = 0) => {
+      let depth = 1;
+      for (let i = startIndex; i < input.length; i++) {
+        const char = input[i];
+        const prev = input[i - 1];
+        if (char === '{' && prev !== '\\') depth += 1;
+        if (char === '}' && prev !== '\\') depth -= 1;
+        if (depth === 0) return i;
+      }
+      return -1;
+    };
 
     for (let i = 1; i < blocks.length; i++) {
       try {
         let block = blocks[i];
 
         // 1. Extract Question
-        let qEnd = block.indexOf('}');
+        let qEnd = findMatchingBrace(block, 0);
+        if (qEnd === -1) continue;
         let rawQ = block.substring(0, qEnd).trim();
 
         // 2. Extract Options
@@ -363,7 +377,7 @@ export default function App() {
           )}
         </div>
         <p className={`absolute bottom-2 left-1/2 -translate-x-1/2 text-[11px] ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
-          (c) akshit 2026
+          (c) akshit 2026 | {BUILD_ID}
         </p>
       </div>
     );
@@ -450,7 +464,7 @@ export default function App() {
           </button>
         </div>
         <p className={`absolute bottom-2 left-1/2 -translate-x-1/2 text-[11px] ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
-          (c) akshit 2026
+          (c) akshit 2026 | {BUILD_ID}
         </p>
       </div>
     );
@@ -615,7 +629,7 @@ export default function App() {
         </button>
       </div>
       <p className={`absolute bottom-1 left-1/2 -translate-x-1/2 text-[11px] ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
-        (c) akshit 2026
+        (c) akshit 2026 | {BUILD_ID}
       </p>
 
     </div>

@@ -23,7 +23,7 @@ npm run preview
 ```bash
 git clone https://github.com/Akshit11318/bt1010quiz.git
 cd bt1010quiz
-docker build -t bt1010quiz:latest .
+docker build --build-arg VITE_BUILD_ID=$(git rev-parse --short HEAD) -t bt1010quiz:latest .
 docker rm -f bt1010quiz 2>/dev/null || true
 docker run -d --name bt1010quiz -p 127.0.0.1:8090:80 --restart unless-stopped bt1010quiz:latest
 ```
@@ -53,6 +53,6 @@ cloudflared tunnel run
 cd bt1010quiz
 git pull
 docker rm -f bt1010quiz 2>/dev/null || true
-docker build -t bt1010quiz:latest .
+docker build --build-arg VITE_BUILD_ID=$(git rev-parse --short HEAD) -t bt1010quiz:latest .
 docker run -d --name bt1010quiz -p 127.0.0.1:8090:80 --restart unless-stopped bt1010quiz:latest
 ```

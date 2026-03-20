@@ -2,6 +2,8 @@
 
 FROM node:20-alpine AS build
 WORKDIR /app
+ARG VITE_BUILD_ID=local
+ENV VITE_BUILD_ID=$VITE_BUILD_ID
 COPY package*.json ./
 RUN npm ci
 COPY . .
