@@ -109,20 +109,58 @@ export default function App() {
           return escaped
             .replace(/\\textbf\{(.*?)\}/g, '$1')
             .replace(/\\textit\{(.*?)\}/g, '$1')
+            .replace(/\\emph\{(.*?)\}/g, '$1')
+            .replace(/\\texttt\{(.*?)\}/g, '$1')
+            .replace(/\\textsf\{(.*?)\}/g, '$1')
+            .replace(/\\mathrm\{(.*?)\}/g, '$1')
+            .replace(/\\mathbf\{(.*?)\}/g, '$1')
             .replace(/\\\\\s*/g, ' ')
             .replace(/\\end\{enumerate\}.*/s, '')
             .replace(/\$([^$]+)\$/g, '$1')
+            .replace(/\\\((.*?)\\\)/g, '$1')
+            .replace(/\\\[(.*?)\\\]/g, '$1')
             .replace(/\\underline\{\\hspace\{[^}]+\}\}/g, '_____')
             .replace(/(?:\\_){2,}/g, '_____')
+            .replace(/\\left/g, '')
+            .replace(/\\right/g, '')
+            .replace(/\\times/g, 'X')
+            .replace(/\\cdot/g, '·')
             .replace(/\\rightarrow/g, '→')
+            .replace(/\\leftarrow/g, '←')
+            .replace(/\\leftrightarrow/g, '↔')
             .replace(/\\rightleftharpoons/g, '⇌')
+            .replace(/\\leq/g, '≤')
+            .replace(/\\geq/g, '≥')
+            .replace(/\\neq/g, '≠')
+            .replace(/\\approx/g, '≈')
+            .replace(/\\pm/g, '±')
+            .replace(/\\infty/g, '∞')
             .replace(/\\circ\\text\{C\}/g, '°C')
+            .replace(/\\circ/g, '°')
+            .replace(/\\alpha/g, 'α')
+            .replace(/\\beta/g, 'β')
+            .replace(/\\gamma/g, 'γ')
             .replace(/\\delta/g, 'δ')
+            .replace(/\\theta/g, 'θ')
+            .replace(/\\lambda/g, 'λ')
+            .replace(/\\pi/g, 'π')
+            .replace(/\\sigma/g, 'σ')
+            .replace(/\\omega/g, 'ω')
             .replace(/\\mu/g, 'μ')
+            .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)')
+            .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
+            .replace(/\\%/g, '%')
+            .replace(/\\#/g, '#')
+            .replace(/\\\{/g, '{')
+            .replace(/\\\}/g, '}')
             .replace(/([A-Za-z0-9)\]])_\{([^}]+)\}/g, '$1<sub>$2</sub>')
             .replace(/([A-Za-z0-9)\]])_([A-Za-z0-9+-])/g, '$1<sub>$2</sub>')
             .replace(/([A-Za-z0-9)\]])\^\{([^}]+)\}/g, '$1<sup>$2</sup>')
             .replace(/([A-Za-z0-9)\]])\^([A-Za-z0-9+-])/g, '$1<sup>$2</sup>')
+            .replace(/\\,/g, ' ')
+            .replace(/\\;/g, ' ')
+            .replace(/\\!/g, '')
+            .replace(/\s{2,}/g, ' ')
             .trim();
         };
 
@@ -237,12 +275,13 @@ export default function App() {
   };
 
   // --- Screens ---
+  const appShellClass = `relative flex flex-col h-[calc(100dvh-1rem)] mt-2 lg:mt-4 w-full max-w-full sm:max-w-2xl lg:max-w-4xl mx-auto ${theme === 'dark' ? 'bg-slate-900' : 'bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} rounded-2xl overflow-hidden font-sans`;
 
   if (gameState === 'START') {
     return (
-      <div className={`relative flex flex-col h-[calc(100dvh-1rem)] mt-2 max-w-lg mx-auto ${theme === 'dark' ? 'bg-slate-900' : 'bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} rounded-2xl overflow-hidden font-sans`}>
+      <div className={appShellClass}>
         {/* Header with Theme Toggle */}
-        <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-b px-4 sm:px-6 py-4 flex items-center justify-between`}>
+        <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-b px-3 sm:px-5 lg:px-7 py-3.5 sm:py-4 flex items-center justify-between`}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
               <BookOpen className="text-white w-5 h-5" />
@@ -258,7 +297,7 @@ export default function App() {
         </div>
 
         {/* Tabs */}
-        <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-b flex gap-2 px-4 sm:px-6 py-3`}>
+        <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-b flex gap-2 px-3 sm:px-5 lg:px-7 py-2.5 sm:py-3`}>
           {['Q1', 'Q2', 'ENDSEM'].map((tab) => (
             <button
               key={tab}
@@ -276,7 +315,7 @@ export default function App() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-8 flex flex-col items-center">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-5 lg:px-7 py-5 sm:py-6 lg:py-7 flex flex-col items-center">
           {/* Q1 Tab - All Quiz Modules */}
           {activeTab === 'Q1' && (
             <>
@@ -294,13 +333,13 @@ export default function App() {
                 </div>
               )}
 
-              <div className="w-full space-y-3">
+              <div className="w-full max-w-3xl space-y-2.5 sm:space-y-3">
                 {QUIZ_MODULES.map((module) => (
                   <button
                     key={module.id}
                     onClick={() => loadQuiz(module)}
                     disabled={isLoading}
-                    className={`w-full ${theme === 'dark' ? 'bg-slate-800 border-slate-700 hover:border-blue-500' : 'bg-white border-slate-100 hover:border-blue-300'} p-4 rounded-2xl shadow-sm border hover:shadow-md transition-all flex items-center gap-4 text-left active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed`}
+                    className={`w-full ${theme === 'dark' ? 'bg-slate-800 border-slate-700 hover:border-blue-500' : 'bg-white border-slate-100 hover:border-blue-300'} p-3.5 sm:p-4 rounded-2xl shadow-sm border hover:shadow-md transition-all flex items-center gap-3 sm:gap-4 text-left active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-inner ${module.color}`}>
                       {isLoading ? (
@@ -337,13 +376,13 @@ export default function App() {
                 </div>
               )}
 
-              <div className="w-full space-y-3">
+              <div className="w-full max-w-3xl space-y-2.5 sm:space-y-3">
                 {Q2_MODULES.map((module) => (
                   <button
                     key={module.id}
                     onClick={() => loadQuiz(module)}
                     disabled={isLoading}
-                    className={`w-full ${theme === 'dark' ? 'bg-slate-800 border-slate-700 hover:border-blue-500' : 'bg-white border-slate-100 hover:border-blue-300'} p-4 rounded-2xl shadow-sm border hover:shadow-md transition-all flex items-center gap-4 text-left active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed`}
+                    className={`w-full ${theme === 'dark' ? 'bg-slate-800 border-slate-700 hover:border-blue-500' : 'bg-white border-slate-100 hover:border-blue-300'} p-3.5 sm:p-4 rounded-2xl shadow-sm border hover:shadow-md transition-all flex items-center gap-3 sm:gap-4 text-left active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-inner ${module.color}`}>
                       {isLoading ? (
@@ -385,8 +424,8 @@ export default function App() {
 
   if (gameState === 'RESULTS') {
     return (
-      <div className={`relative flex flex-col h-[calc(100dvh-1rem)] mt-2 max-w-lg mx-auto ${theme === 'dark' ? 'bg-slate-900' : 'bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} rounded-2xl overflow-hidden font-sans`}>
-        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-12 pb-16 flex flex-col items-center">
+      <div className={appShellClass}>
+        <div className="flex-1 overflow-y-auto px-3 sm:px-5 lg:px-7 py-8 sm:py-10 pb-16 flex flex-col items-center">
           <button
             onClick={toggleTheme}
             className={`absolute top-4 right-4 sm:right-6 p-2.5 rounded-xl ${theme === 'dark' ? 'bg-slate-800 text-yellow-400' : 'bg-white text-slate-600'} shadow-sm border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} hover:scale-105 transition-transform`}
@@ -476,10 +515,10 @@ export default function App() {
   const progressPercent = ((currentQ + 1) / questions.length) * 100;
 
   return (
-    <div className={`relative flex flex-col h-[calc(100dvh-1rem)] mt-2 max-w-lg mx-auto ${theme === 'dark' ? 'bg-slate-900' : 'bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} rounded-2xl overflow-hidden font-sans`}>
+    <div className={appShellClass}>
 
       {/* Top Header */}
-      <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} pt-4 pb-4 px-4 sm:px-6 border-b shadow-sm z-10`}>
+      <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} pt-3.5 pb-3.5 sm:pt-4 sm:pb-4 px-3 sm:px-5 lg:px-7 border-b shadow-sm z-10`}>
         <div className="flex justify-between items-center mb-3">
           <div className="flex flex-col flex-1">
             <span className="text-[12px] font-semibold uppercase tracking-wide text-slate-400 mb-1 line-clamp-1">
@@ -511,7 +550,7 @@ export default function App() {
       </div>
 
       {/* Question Content */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scroll-smooth">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-5 lg:px-7 py-4 sm:py-5 lg:py-6 scroll-smooth">
         <h2
           className={`text-[19px] font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-800'} leading-8 mb-4`}
           dangerouslySetInnerHTML={{ __html: q.q }}
@@ -522,7 +561,7 @@ export default function App() {
           </p>
         )}
 
-        <div className="space-y-3">
+        <div className="space-y-2.5 sm:space-y-3">
           {q.opts.map((opt, i) => {
             // Determine styles based on selection state
             let btnStyle = theme === 'dark'
@@ -556,7 +595,7 @@ export default function App() {
                 key={i}
                 disabled={isAnswered}
                 onClick={() => handleAnswer(i)}
-                className={`w-full text-left p-4 rounded-2xl border-2 transition-all duration-300 flex items-start gap-3 shadow-sm ${btnStyle}`}
+                className={`w-full text-left p-3.5 sm:p-4 rounded-2xl border-2 transition-all duration-300 flex items-start gap-2.5 sm:gap-3 shadow-sm ${btnStyle}`}
               >
                 <div className={`flex items-center justify-center flex-shrink-0 w-10 h-10 rounded-full text-sm font-semibold ${isAnswered && i === q.ans ? "bg-green-200 text-green-800" :
                   isAnswered && i === selectedAns ? "bg-red-200 text-red-800" :
@@ -586,11 +625,11 @@ export default function App() {
         )}
 
         {/* Spacer for bottom bar */}
-        <div className="h-32"></div>
+        <div className="h-28 sm:h-32"></div>
       </div>
 
       {/* Bottom Bar */}
-      <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-t p-5 flex gap-3 pb-safe absolute bottom-5 w-full max-w-lg shadow-lg`}>
+      <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-t px-3 sm:px-5 lg:px-7 py-3.5 sm:py-4 flex gap-2.5 sm:gap-3 pb-safe absolute bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-0.75rem)] sm:w-[calc(100%-1.5rem)] lg:w-[calc(100%-2rem)] max-w-4xl shadow-lg rounded-2xl`}>
         <button
           onClick={toggleBookmark}
           className={`h-14 w-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-200 border-2 ${bookmarks.has(currentQ)
