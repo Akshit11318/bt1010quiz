@@ -2,8 +2,19 @@ import React, { useState, useEffect } from 'react';
 import {
   Play, Bookmark, BookmarkCheck, ChevronRight, Home,
   Download, RotateCcw, CheckCircle2, XCircle, FileText, AlertCircle, BookOpen, Loader2,
-  Sun, Moon, LogOut
+  LogOut
 } from 'lucide-react';
+import { ThemeToggle } from '@/components/quiz/ThemeToggle';
+import { QuizModuleCard } from '@/components/quiz/QuizModuleCard';
+import { OptionButton } from '@/components/quiz/OptionButton';
+import { ProgressBar } from '@/components/quiz/ProgressBar';
+import { ExplanationBox } from '@/components/quiz/ExplanationBox';
+import { AppShell } from '@/components/layout/AppShell';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const BUILD_ID = import.meta.env.VITE_BUILD_ID || 'local';
 
@@ -37,7 +48,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem('biomaster-tab') || 'Q2');
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('biomaster-theme');
-    return saved || 'light';
+    return saved || 'dark';
   });
 
   useEffect(() => {
@@ -48,6 +59,62 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('biomaster-tab', activeTab);
   }, [activeTab]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Only handle keyboard shortcuts in PLAYING state
+      if (gameState !== 'PLAYING') return;
+
+      // Ignore if user is typing in an input field or has modifier keys pressed
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.metaKey || e.ctrlKey || e.altKey) {
+        return;
+      }
+
+      const currentQuestion = questions[currentQ];
+      if (!currentQuestion) return;
+
+      // Number keys 1-5 for selecting options (when not answered)
+      if (!selectedAns && e.key >= '1' && e.key <= '5') {
+        const index = parseInt(e.key) - 1;
+        if (index < currentQuestion.opts.length) {
+          e.preventDefault();
+          handleAnswer(index);
+        }
+      }
+
+      // Enter or Space for next question (when answered)
+      if (selectedAns !== null && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        nextQuestion();
+      }
+
+      // B for bookmark
+      if (e.key === 'b' || e.key === 'B') {
+        e.preventDefault();
+        toggleBookmark();
+      }
+
+      // T for theme toggle
+      if (e.key === 't' || e.key === 'T') {
+        e.preventDefault();
+        toggleTheme();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, questions, currentQ, selectedAns]);
+
+  // Focus management - focus first option when question loads
+  useEffect(() => {
+    if (gameState === 'PLAYING' && selectedAns === null) {
+      const firstOption = document.querySelector('[data-option-index="0"]');
+      if (firstOption) {
+        firstOption.focus();
+      }
+    }
+  }, [currentQ, gameState, selectedAns]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
@@ -275,85 +342,58 @@ export default function App() {
   };
 
   // --- Screens ---
-  const appShellClass = `relative flex flex-col h-[calc(100dvh-1rem)] mt-2 lg:mt-4 w-full max-w-full sm:max-w-2xl lg:max-w-4xl mx-auto ${theme === 'dark' ? 'bg-slate-900' : 'bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} rounded-2xl overflow-hidden font-sans`;
-
   if (gameState === 'START') {
     return (
-      <div className={appShellClass}>
+      <AppShell>
         {/* Header with Theme Toggle */}
-        <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-b px-3 sm:px-5 lg:px-7 py-3.5 sm:py-4 flex items-center justify-between`}>
+        <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
               <BookOpen className="text-white w-5 h-5" />
             </div>
-            <h1 className={`text-xl font-extrabold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>BT1010</h1>
+            <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">BT1010</h1>
           </div>
-          <button
-            onClick={toggleTheme}
-            className={`p-2.5 rounded-xl ${theme === 'dark' ? 'bg-slate-700 text-yellow-400' : 'bg-slate-100 text-slate-600'} shadow-sm border ${theme === 'dark' ? 'border-slate-600' : 'border-slate-200'} hover:scale-105 transition-transform`}
-          >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
 
         {/* Tabs */}
-        <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-b flex gap-2 px-3 sm:px-5 lg:px-7 py-2.5 sm:py-3`}>
-          {['Q1', 'Q2', 'ENDSEM'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === tab
-                ? 'bg-blue-600 text-white shadow-md'
-                : theme === 'dark'
-                  ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-            >
-              {tab}
-            </button>
-          ))}
+        <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 sm:px-8 lg:px-12 py-2.5 sm:py-3">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="Q1">Q1</TabsTrigger>
+              <TabsTrigger value="Q2">Q2</TabsTrigger>
+              <TabsTrigger value="ENDSEM">ENDSEM</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-3 sm:px-5 lg:px-7 py-5 sm:py-6 lg:py-7 flex flex-col items-center">
+        <div className="flex-1 overflow-y-auto px-6 sm:px-8 lg:px-12 py-5 sm:py-6 lg:py-7 flex flex-col items-center">
           {/* Q1 Tab - All Quiz Modules */}
           {activeTab === 'Q1' && (
             <>
               <div className="text-center mb-8 w-full">
-                <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-900'} mb-2`}>Quizzes</h2>
-                <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} text-sm`}>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Quizzes</h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">
                   Select a chapter to begin your quiz.
                 </p>
               </div>
 
               {error && (
-                <div className="mb-6 flex items-start gap-2 text-red-600 bg-red-50 p-4 rounded-2xl w-full text-sm font-medium border border-red-100">
-                  <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
-                  <p>{error}</p>
-                </div>
+                <Alert variant="destructive" className="mb-6 w-full">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
 
               <div className="w-full max-w-3xl space-y-2.5 sm:space-y-3">
                 {QUIZ_MODULES.map((module) => (
-                  <button
+                  <QuizModuleCard
                     key={module.id}
-                    onClick={() => loadQuiz(module)}
-                    disabled={isLoading}
-                    className={`w-full ${theme === 'dark' ? 'bg-slate-800 border-slate-700 hover:border-blue-500' : 'bg-white border-slate-100 hover:border-blue-300'} p-3.5 sm:p-4 rounded-2xl shadow-sm border hover:shadow-md transition-all flex items-center gap-3 sm:gap-4 text-left active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed`}
-                  >
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-inner ${module.color}`}>
-                      {isLoading ? (
-                        <Loader2 className="w-6 h-6 text-white animate-spin" />
-                      ) : (
-                        <FileText className="w-6 h-6 text-white" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className={`font-bold ${theme === 'dark' ? 'text-slate-100' : 'text-slate-800'} text-[15px]`}>{module.title}</h3>
-                      <p className={`text-xs ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} font-medium font-mono mt-0.5`}>{module.file}</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-slate-300" />
-                  </button>
+                    module={module}
+                    onLoadQuiz={loadQuiz}
+                    isLoading={isLoading}
+                  />
                 ))}
               </div>
             </>
@@ -363,40 +403,27 @@ export default function App() {
           {activeTab === 'Q2' && (
             <>
               <div className="text-center mb-6 w-full">
-                <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-900'} mb-2`}>Q2 Chapters (06-14)</h2>
-                <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} text-sm`}>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Q2 Chapters (06-14)</h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">
                   Start chapter-wise quiz practice.
                 </p>
               </div>
 
               {error && (
-                <div className="mb-6 flex items-start gap-2 text-red-600 bg-red-50 p-4 rounded-2xl w-full text-sm font-medium border border-red-100">
-                  <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
-                  <p>{error}</p>
-                </div>
+                <Alert variant="destructive" className="mb-6 w-full">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
 
               <div className="w-full max-w-3xl space-y-2.5 sm:space-y-3">
                 {Q2_MODULES.map((module) => (
-                  <button
+                  <QuizModuleCard
                     key={module.id}
-                    onClick={() => loadQuiz(module)}
-                    disabled={isLoading}
-                    className={`w-full ${theme === 'dark' ? 'bg-slate-800 border-slate-700 hover:border-blue-500' : 'bg-white border-slate-100 hover:border-blue-300'} p-3.5 sm:p-4 rounded-2xl shadow-sm border hover:shadow-md transition-all flex items-center gap-3 sm:gap-4 text-left active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed`}
-                  >
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-inner ${module.color}`}>
-                      {isLoading ? (
-                        <Loader2 className="w-6 h-6 text-white animate-spin" />
-                      ) : (
-                        <FileText className="w-6 h-6 text-white" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className={`font-bold ${theme === 'dark' ? 'text-slate-100' : 'text-slate-800'} text-[15px]`}>{module.title}</h3>
-                      <p className={`text-xs ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} font-medium font-mono mt-0.5`}>{module.file}</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-slate-300" />
-                  </button>
+                    module={module}
+                    onLoadQuiz={loadQuiz}
+                    isLoading={isLoading}
+                  />
                 ))}
               </div>
             </>
@@ -405,35 +432,30 @@ export default function App() {
           {/* ENDSEM Tab - Coming Soon */}
           {activeTab === 'ENDSEM' && (
             <div className="w-full h-full flex flex-col items-center justify-center text-center">
-              <div className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-4 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`}>
-                <FileText className={`w-8 h-8 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`} />
+              <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-4 bg-slate-100 dark:bg-slate-800">
+                <FileText className="w-8 h-8 text-slate-400 dark:text-slate-500" />
               </div>
-              <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-900'} mb-2`}>ENDSEM</h3>
-              <p className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} text-sm`}>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">ENDSEM</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
                 Coming soon...
               </p>
             </div>
           )}
         </div>
-        <p className={`absolute bottom-2 left-1/2 -translate-x-1/2 text-[11px] ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
-          (c) akshit 2026 | {BUILD_ID}
-        </p>
-      </div>
+      </AppShell>
     );
   }
 
   if (gameState === 'RESULTS') {
     return (
-      <div className={appShellClass}>
-        <div className="flex-1 overflow-y-auto px-3 sm:px-5 lg:px-7 py-8 sm:py-10 pb-16 flex flex-col items-center">
-          <button
-            onClick={toggleTheme}
-            className={`absolute top-4 right-4 sm:right-6 p-2.5 rounded-xl ${theme === 'dark' ? 'bg-slate-800 text-yellow-400' : 'bg-white text-slate-600'} shadow-sm border ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} hover:scale-105 transition-transform`}
-          >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-          <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-800'} mb-2`}>Quiz Completed!</h2>
-          <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} mb-8 font-medium text-center`}>{activeQuizTitle}</p>
+      <AppShell>
+        <div className="flex-1 overflow-y-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-10 pb-16 flex flex-col items-center">
+          <div className="absolute top-4 right-4 sm:right-6">
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          </div>
+
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Quiz Completed!</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 font-medium text-center">{activeQuizTitle}</p>
 
           <div className="relative w-40 h-40 mb-8 flex items-center justify-center">
             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
@@ -460,27 +482,28 @@ export default function App() {
             </div>
           </div>
 
-          <div className={`w-full ${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'} p-5 rounded-3xl shadow-sm border mb-6`}>
-            <div className="flex items-center gap-3 mb-1">
-              <BookmarkCheck className="text-blue-500 w-6 h-6" />
-              <h3 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-800'} text-lg`}>Saved Questions</h3>
-            </div>
-            <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} mb-4`}>You bookmarked {bookmarks.size} important questions for review.</p>
+          <Card className="w-full mb-6">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3 mb-1">
+                <BookmarkCheck className="text-blue-500 w-6 h-6" />
+                <h3 className="font-semibold text-slate-800 dark:text-white text-lg">Saved Questions</h3>
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">You bookmarked {bookmarks.size} important questions for review.</p>
 
-            <button
-              onClick={exportBookmarks}
-              disabled={bookmarks.size === 0}
-              className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors ${bookmarks.size > 0
-                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                }`}
-            >
-              <Download size={18} />
-              Export to Text File
-            </button>
-          </div>
+              <Button
+                onClick={exportBookmarks}
+                disabled={bookmarks.size === 0}
+                variant={bookmarks.size > 0 ? "default" : "secondary"}
+                className="w-full"
+                aria-label="Export bookmarked questions to text file"
+              >
+                <Download size={18} className="mr-2" />
+                Export to Text File
+              </Button>
+            </CardContent>
+          </Card>
 
-          <button
+          <Button
             onClick={() => {
               setScore(0);
               setCurrentQ(0);
@@ -488,189 +511,125 @@ export default function App() {
               setBookmarks(new Set());
               setGameState('PLAYING');
             }}
-            className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl mb-3 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+            className="w-full mb-3"
+            size="lg"
+            aria-label="Play quiz again"
           >
-            <RotateCcw size={18} />
+            <RotateCcw size={18} className="mr-2" />
             Play Again
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={resetToStart}
-            className={`w-full ${theme === 'dark' ? 'bg-slate-800 text-slate-200 border-slate-700' : 'bg-white text-slate-700 border-slate-200'} border font-bold py-4 rounded-2xl flex items-center justify-center gap-2 active:scale-[0.98] transition-transform`}
+            variant="outline"
+            className="w-full"
+            size="lg"
+            aria-label="Return to chapter selection"
           >
-            <Home size={18} />
+            <Home size={18} className="mr-2" />
             Select Different Chapter
-          </button>
+          </Button>
         </div>
-        <p className={`absolute bottom-2 left-1/2 -translate-x-1/2 text-[11px] ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
-          (c) akshit 2026 | {BUILD_ID}
-        </p>
-      </div>
+      </AppShell>
     );
   }
 
   // PLAYING STATE
   const q = questions[currentQ];
   const isAnswered = selectedAns !== null;
-  const progressPercent = ((currentQ + 1) / questions.length) * 100;
 
   return (
-    <div className={appShellClass}>
-
+    <AppShell>
       {/* Top Header */}
-      <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} pt-3.5 pb-3.5 sm:pt-4 sm:pb-4 px-3 sm:px-5 lg:px-7 border-b shadow-sm z-10`}>
+      <div className="bg-white dark:bg-slate-800 pt-3.5 pb-3.5 sm:pt-4 sm:pb-4 px-6 sm:px-8 lg:px-12 border-b border-slate-200 dark:border-slate-700 shadow-sm z-10">
         <div className="flex justify-between items-center mb-3">
           <div className="flex flex-col flex-1">
             <span className="text-[12px] font-semibold uppercase tracking-wide text-slate-400 mb-1 line-clamp-1">
               {activeQuizTitle}
             </span>
-            <span className={`text-[16px] font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>
+            <span className="text-[16px] font-semibold text-slate-800 dark:text-white">
               Question {currentQ + 1} of {questions.length}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={toggleTheme}
-              className={`p-2.5 rounded-xl ${theme === 'dark' ? 'bg-slate-700 text-yellow-400' : 'bg-slate-100 text-slate-600'} hover:scale-105 transition-all duration-200`}
-            >
-              {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-            </button>
-            <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full flex-shrink-0">
-              Score: {score}
-            </span>
+            <ThemeToggle theme={theme} onToggle={toggleTheme} className="w-10 h-10" />
+            <Badge variant="secondary" className="bg-blue-100 text-blue-700 text-base font-bold px-3 py-1.5 flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
+              {score}
+            </Badge>
           </div>
         </div>
-        {/* Progress bar */}
-        <div className={`w-full ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'} rounded-full h-2.5 overflow-hidden`}>
-          <div
-            className="bg-blue-500 h-2.5 rounded-full transition-all duration-500 ease-out shadow-sm"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
+        <ProgressBar current={currentQ} total={questions.length} />
       </div>
 
       {/* Question Content */}
-      <div className="flex-1 overflow-y-auto px-3 sm:px-5 lg:px-7 py-4 sm:py-5 lg:py-6 scroll-smooth">
+      <div className="flex-1 overflow-y-auto px-6 sm:px-8 lg:px-12 py-4 sm:py-5 lg:py-6 scroll-smooth">
         <h2
-          className={`text-[19px] font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-800'} leading-8 mb-4`}
+          className="text-[19px] font-semibold text-slate-800 dark:text-white leading-8 mb-4 break-words"
           dangerouslySetInnerHTML={{ __html: q.q }}
         />
         {!isAnswered && (
-          <p className={`text-xs mb-4 font-normal ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
+          <p className="text-xs mb-4 font-normal text-slate-500 dark:text-slate-400">
             Tap an option to reveal answer and explanation.
           </p>
         )}
 
-        <div className="space-y-2.5 sm:space-y-3">
-          {q.opts.map((opt, i) => {
-            // Determine styles based on selection state
-            let btnStyle = theme === 'dark'
-              ? "bg-slate-800 border-slate-600 text-slate-200 hover:border-blue-400 hover:shadow-lg hover:scale-[1.01]"
-              : "bg-white border-slate-200 text-slate-700 hover:border-blue-300 hover:shadow-lg hover:scale-[1.01]";
-            let icon = null;
-
-            if (isAnswered) {
-              if (i === q.ans) {
-                // Correct answer gets highlighted green
-                btnStyle = theme === 'dark'
-                  ? "bg-green-900/40 border-green-500 text-green-100 ring-1 ring-green-500 shadow-sm"
-                  : "bg-green-50 border-green-500 text-green-900 ring-1 ring-green-500 shadow-sm";
-                icon = <CheckCircle2 className="w-5 h-5 text-green-600 ml-auto flex-shrink-0" />;
-              } else if (i === selectedAns) {
-                // Selected wrong answer gets highlighted red
-                btnStyle = theme === 'dark'
-                  ? "bg-red-900/40 border-red-500 text-red-100 ring-1 ring-red-500 shadow-sm"
-                  : "bg-red-50 border-red-500 text-red-900 ring-1 ring-red-500 shadow-sm";
-                icon = <XCircle className="w-5 h-5 text-red-600 ml-auto flex-shrink-0" />;
-              } else {
-                // Other unselected wrong answers fade out slightly
-                btnStyle = theme === 'dark'
-                  ? "bg-slate-800 border-slate-700 text-slate-500 opacity-60"
-                  : "bg-white border-slate-200 text-slate-400 opacity-60";
-              }
-            }
-
-            return (
-              <button
-                key={i}
-                disabled={isAnswered}
-                onClick={() => handleAnswer(i)}
-                className={`w-full text-left p-3.5 sm:p-4 rounded-2xl border-2 transition-all duration-300 flex items-start gap-2.5 sm:gap-3 shadow-sm ${btnStyle}`}
-              >
-                <div className={`flex items-center justify-center flex-shrink-0 w-10 h-10 rounded-full text-sm font-semibold ${isAnswered && i === q.ans ? "bg-green-200 text-green-800" :
-                  isAnswered && i === selectedAns ? "bg-red-200 text-red-800" :
-                    "bg-slate-100 text-slate-600"
-                  }`}>
-                  {String.fromCharCode(65 + i)}
-                </div>
-                <span
-                  className="font-medium text-[16px] leading-6 flex-1 pt-1"
-                  dangerouslySetInnerHTML={{ __html: opt }}
-                />
-                {icon}
-              </button>
-            );
-          })}
+        <div className="space-y-5 sm:space-y-6">
+          {q.opts.map((opt, i) => (
+            <OptionButton
+              key={i}
+              option={opt}
+              index={i}
+              isCorrect={i === q.ans}
+              isSelected={i === selectedAns}
+              isAnswered={isAnswered}
+              onSelect={handleAnswer}
+            />
+          ))}
         </div>
 
-        {/* Explanation Box */}
-        {isAnswered && (
-          <div className={`mt-6 ${theme === 'dark' ? 'bg-blue-900/30 border-blue-700' : 'bg-blue-50/80 border-blue-100'} border rounded-2xl p-5 animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-sm`}>
-            <h4 className={`text-xs font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-blue-300' : 'text-blue-800'} mb-3`}>Explanation</h4>
-            <p
-              className={`text-[15px] font-serif ${theme === 'dark' ? 'text-blue-200' : 'text-blue-900/80'} leading-7`}
-              dangerouslySetInnerHTML={{ __html: q.exp }}
-            />
-          </div>
-        )}
+        {isAnswered && <ExplanationBox explanation={q.exp} />}
 
         {/* Spacer for bottom bar */}
         <div className="h-28 sm:h-32"></div>
       </div>
 
       {/* Bottom Bar */}
-      <div className={`${theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} border-t px-3 sm:px-5 lg:px-7 py-3.5 sm:py-4 flex gap-2.5 sm:gap-3 pb-safe absolute bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-0.75rem)] sm:w-[calc(100%-1.5rem)] lg:w-[calc(100%-2rem)] max-w-4xl shadow-lg rounded-2xl`}>
-        <button
+      <div className="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 px-6 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex gap-2.5 sm:gap-3 pb-safe absolute bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-0.75rem)] sm:w-[calc(100%-1.5rem)] lg:w-[calc(100%-2rem)] max-w-4xl shadow-lg rounded-2xl">
+        <Button
           onClick={toggleBookmark}
-          className={`h-14 w-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-200 border-2 ${bookmarks.has(currentQ)
-            ? 'bg-yellow-50 border-yellow-400 text-yellow-500 shadow-md scale-105'
-            : theme === 'dark'
-              ? 'bg-slate-700 border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300 hover:scale-105'
-              : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600 hover:scale-105'
+          variant="outline"
+          size="icon"
+          aria-label={bookmarks.has(currentQ) ? "Remove bookmark" : "Add bookmark"}
+          aria-pressed={bookmarks.has(currentQ)}
+          className={`h-14 w-14 rounded-2xl flex-shrink-0 min-w-[56px] min-h-[56px] ${bookmarks.has(currentQ)
+            ? 'bg-yellow-50 border-yellow-400 text-yellow-500 hover:bg-yellow-100 shadow-md scale-105'
+            : ''
             }`}
         >
-          <Bookmark className={`w-6 h-6 ${bookmarks.has(currentQ) ? 'fill-current' : ''}`} />
-        </button>
+          <Bookmark className={`w-6 h-6 ${bookmarks.has(currentQ) ? 'fill-current' : ''}`} aria-hidden="true" />
+        </Button>
 
-        <button
+        <Button
           onClick={endQuiz}
-          className={`h-14 w-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-200 border-2 ${theme === 'dark'
-            ? 'bg-slate-700 border-slate-600 text-red-400 hover:bg-red-900/30 hover:border-red-600 hover:scale-105'
-            : 'bg-white border-slate-200 text-red-500 hover:bg-red-50 hover:border-red-300 hover:scale-105'
-            }`}
-          title="End Quiz"
+          variant="outline"
+          size="icon"
+          aria-label="End quiz"
+          className="h-14 w-14 rounded-2xl flex-shrink-0 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 hover:border-red-300 dark:hover:border-red-600 min-w-[56px] min-h-[56px]"
         >
-          <LogOut className="w-5 h-5" />
-        </button>
+          <LogOut className="w-5 h-5" aria-hidden="true" />
+        </Button>
 
-        <button
+        <Button
           onClick={nextQuestion}
           disabled={!isAnswered}
-          className={`flex-1 h-14 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2 transition-all duration-200 ${isAnswered
-            ? 'bg-slate-900 text-white shadow-lg hover:shadow-xl active:scale-[0.98]'
-            : theme === 'dark'
-              ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-              : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-            }`}
+          size="lg"
+          aria-label={currentQ === questions.length - 1 ? 'Finish quiz' : 'Next question'}
+          className="flex-1 h-14 rounded-2xl min-h-[56px]"
         >
           {currentQ === questions.length - 1 ? 'Finish Quiz' : 'Next Question'}
-          {isAnswered && <ChevronRight size={20} />}
-        </button>
+          {isAnswered && <ChevronRight size={20} className="ml-2" aria-hidden="true" />}
+        </Button>
       </div>
-      <p className={`absolute bottom-1 left-1/2 -translate-x-1/2 text-[11px] ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
-        (c) akshit 2026 | {BUILD_ID}
-      </p>
-
-    </div>
+    </AppShell>
   );
 }
